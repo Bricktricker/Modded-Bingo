@@ -18,8 +18,6 @@ public class CommandBingoTeam {
 	public static LiteralArgumentBuilder<CommandSource> register() {
 		LiteralArgumentBuilder<CommandSource> builder = Commands.literal("team").requires(sender ->sender.hasPermissionLevel(0));
 		
-		ModdedBingo.LOG.info("num Teams {}", Team.getTeamNames().size());
-		
 		for(String team : Team.getTeamNames()) {
 			builder.then(Commands.literal(team)
 				.executes(ctx -> {
