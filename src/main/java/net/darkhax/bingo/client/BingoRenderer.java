@@ -18,6 +18,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -73,11 +74,8 @@ public class BingoRenderer {
 			mc.fontRenderer.drawString(event.getMatrixStack(), "Time: " + StringUtils.ticksToElapsedTime((int) (endTime - bingo.getStartTime())), 14, 2, 0xffffff);
 		}
 
-		RenderSystem.pushMatrix();
-		RenderSystem.color3f(1f, 1f, 1f);
-
 		mc.getTextureManager().bindTexture(TEXTURE_LOC);
-		renderGUI(10, 142, 10, 142, 0, 0, 132f / 256f, 0, 132f / 256f);
+		renderGUI(event.getMatrixStack().getLast().getMatrix(), 10, 142, 10, 142, 0, 0, 132f / 256f, 0, 132f / 256f);
 
 		final ItemRenderer itemRender = mc.getItemRenderer();
 
@@ -92,17 +90,16 @@ public class BingoRenderer {
 			}
 		}
 
-		RenderSystem.popMatrix();
 	}
 
 	@SuppressWarnings("deprecation")
-	private static void renderGUI(int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1) {
+	private static void renderGUI(Matrix4f matrix, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1) {
 		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		bufferbuilder.pos((double) x0, (double) y1, (double) z).tex(u0, v1).endVertex();
-		bufferbuilder.pos((double) x1, (double) y1, (double) z).tex(u1, v1).endVertex();
-		bufferbuilder.pos((double) x1, (double) y0, (double) z).tex(u1, v0).endVertex();
-		bufferbuilder.pos((double) x0, (double) y0, (double) z).tex(u0, v0).endVertex();
+		bufferbuilder.pos(matrix, (float) x0, (float) y1, (float) z).tex(u0, v1).endVertex();
+		bufferbuilder.pos(matrix, (float) x1, (float) y1, (float) z).tex(u1, v1).endVertex();
+		bufferbuilder.pos(matrix, (float) x1, (float) y0, (float) z).tex(u1, v0).endVertex();
+		bufferbuilder.pos(matrix, (float) x0, (float) y0, (float) z).tex(u0, v0).endVertex();
 		bufferbuilder.finishDrawing();
 		RenderSystem.enableAlphaTest();
 		WorldVertexBufferUploader.draw(bufferbuilder);
@@ -127,10 +124,10 @@ public class BingoRenderer {
 						final float minV = uvs[1] / texSize;
 						final float maxV = (uvs[1] + uvs[3]) / texSize;
 
-						bufferbuilder.pos(xOffset, yOffset + uvs[3], 0).tex(minU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
-						bufferbuilder.pos(xOffset + uvs[2], yOffset + uvs[3], 0).tex(maxU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
-						bufferbuilder.pos(xOffset + uvs[2], yOffset, 0).tex(maxU, minV).color(color[0], color[1], color[2], 1f).endVertex();
-						bufferbuilder.pos(xOffset, yOffset, 0).tex(minU, minV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.pos(matrix, xOffset, yOffset + uvs[3], 0).tex(minU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.pos(matrix, xOffset + uvs[2], yOffset + uvs[3], 0).tex(maxU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.pos(matrix, xOffset + uvs[2], yOffset, 0).tex(maxU, minV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.pos(matrix, xOffset, yOffset, 0).tex(minU, minV).color(color[0], color[1], color[2], 1f).endVertex();
 					}
 				}
 			}
