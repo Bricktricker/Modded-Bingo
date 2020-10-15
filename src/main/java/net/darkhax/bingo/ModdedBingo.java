@@ -1,9 +1,9 @@
 package net.darkhax.bingo;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,14 +19,14 @@ import net.darkhax.bingo.network.PacketSyncGoal;
 import net.darkhax.bookshelf.network.NetworkHelper;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -40,6 +40,8 @@ public class ModdedBingo {
     public ModdedBingo() {
     	 MinecraftForge.EVENT_BUS.register(this);
     	 FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+    	 
+    	 new BingoAPI(); //Class load Bingo API
     }
     
     private void setup(final FMLCommonSetupEvent event) {    	
@@ -48,13 +50,13 @@ public class ModdedBingo {
     }
     
     @SubscribeEvent
-    public void serverAboutToStart(FMLServerAboutToStartEvent event) {
-    	event.getServer().getResourceManager().addReloadListener(new BingoDataReader());
+    public void onResourceReload(AddReloadListenerEvent event) {
+    	event.addListener(new BingoDataReader());
     }
     
     @SubscribeEvent
-    public void serverStarting(FMLServerStartingEvent event) {
-    	CommandBingo.initializeCommands(event.getCommandDispatcher());
+    public void onCommandsRegister(RegisterCommandsEvent event) {
+    	CommandBingo.initializeCommands(event.getDispatcher());
     }
 
     @SubscribeEvent
@@ -62,11 +64,11 @@ public class ModdedBingo {
 
         // Read the bingo persistent data from nbt data if it exists, when the server is
         // started.
-        final File bingoFile = new File(event.getServer().getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(), "bingo.data");
-
-        if (bingoFile.exists()) {
+        final Path bingoFile = event.getServer().func_240776_a_(FolderName.DOT).resolve("bingo.data");
+        
+        if (Files.exists(bingoFile)) {
             try{
-            	byte[] data = Files.readAllBytes(bingoFile.toPath());
+            	byte[] data = Files.readAllBytes(bingoFile);
             	BingoPersistantData.read(new PacketBuffer(Unpooled.wrappedBuffer(data)));
             }
             catch (final IOException e) {
@@ -86,12 +88,12 @@ public class ModdedBingo {
     public void serverStopping (FMLServerStoppingEvent event) {
 
         // Write the bingo data to the world when the server stops.
-        final File bingoFile = new File(event.getServer().getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(), "bingo.data");
-
-        try(FileOutputStream fos = new FileOutputStream(bingoFile)) {
+    	final Path bingoFile = event.getServer().func_240776_a_(FolderName.DOT).resolve("bingo.data");
+    	
+        try(OutputStream os = Files.newOutputStream(bingoFile)) {
         	ByteBuf byteBuf = Unpooled.buffer();
         	BingoPersistantData.write(new PacketBuffer(byteBuf));
-        	fos.write(byteBuf.array());
+        	os.write(byteBuf.array());
         }
         catch (final IOException e) {
             LOG.error("Failed to write bingo data. This is not good.");

@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 
 import net.darkhax.bingo.ModdedBingo;
 import net.darkhax.bingo.api.BingoAPI;
@@ -24,11 +26,16 @@ public class BingoDataReader extends JsonReloadListener {
 	}
 
 	@Override
-	protected void apply(Map<ResourceLocation, JsonObject> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+	protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 		BingoAPI.resetTables();
 		List<GameMode> gamemodes = new ArrayList<>();
-		objectIn.forEach((rl, jsonObject) -> {
+		objectIn.forEach((rl, jsonElem) -> {
 			try {
+				if(!jsonElem.isJsonObject()) {
+					throw new JsonSyntaxException("Bingo tables need to be a JSON Object");
+				}
+				
+				JsonObject jsonObject = jsonElem.getAsJsonObject();
 				String type = JSONUtils.getString(jsonObject, "type");
 				if(type.equalsIgnoreCase("gamemode")) {
 					GameMode gamemode = BingoAPI.GSON.fromJson(jsonObject, GameMode.class);
@@ -59,5 +66,5 @@ public class BingoDataReader extends JsonReloadListener {
 			}
 		}
 	}
-
+	
 }

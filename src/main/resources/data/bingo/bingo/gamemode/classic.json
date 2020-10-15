@@ -7,7 +7,7 @@
       "type": "bingo:randomize_spawn",
       "setSpawn": true,
       "fallbackBlock": {
-      	"block": "minecraft:bedrock"
+      	"Name": "minecraft:bedrock"
       }
     },
     {

@@ -4,17 +4,21 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 
+import net.darkhax.bingo.ModdedBingo;
 import net.darkhax.bingo.api.team.Team;
 import net.darkhax.bingo.data.BingoPersistantData;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class CommandBingoTeam {
 
 	public static LiteralArgumentBuilder<CommandSource> register() {
 		LiteralArgumentBuilder<CommandSource> builder = Commands.literal("team").requires(sender ->sender.hasPermissionLevel(0));
+		
+		ModdedBingo.LOG.info("num Teams {}", Team.getTeamNames().size());
 		
 		for(String team : Team.getTeamNames()) {
 			builder.then(Commands.literal(team)
@@ -33,7 +37,7 @@ public class CommandBingoTeam {
 			throw new DynamicCommandExceptionType(rl -> new TranslationTextComponent("command.bingo.team.unknown", rl)).create(teamStr);
 		}
 		
-		player.getServer().getPlayerList().sendMessage(new TranslationTextComponent("command.bingo.team.change", player.getName(), team.getTeamName()));
+		player.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.team.change", player.getName(), team.getTeamName()), ChatType.SYSTEM, null);
 		BingoPersistantData.setTeam(player, team);
 	}
 }

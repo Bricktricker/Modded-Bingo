@@ -20,6 +20,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class CommandBingoStart {
@@ -41,7 +42,7 @@ public class CommandBingoStart {
         }
 		
 		BingoAPI.GAME_STATE.start(source.getServer(), source.world.getGameTime());
-		source.getServer().getPlayerList().sendMessage(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()));
+		source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.SYSTEM, null);
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		
 		Map<Team, BlockPos> teamPositions = new HashMap<>();

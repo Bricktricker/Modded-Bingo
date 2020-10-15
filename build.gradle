@@ -77,7 +77,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
     
-    compile fg.deobf("net.darkhax.bookshelf:Bookshelf-1.15.2:${bookshelf_version}")
+    compile fg.deobf("net.darkhax.bookshelf:Bookshelf-1.16.3:${bookshelf_version}")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

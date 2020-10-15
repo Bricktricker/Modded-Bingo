@@ -16,6 +16,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.ResourceLocationArgument;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class CommandBingoCreate {
@@ -65,12 +66,12 @@ public class CommandBingoCreate {
 		
 		if(BingoAPI.GAME_STATE.hasStarted() || BingoAPI.GAME_STATE.isActive()) {
 			BingoAPI.GAME_STATE.end();
-			source.getServer().getPlayerList().sendMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), true);
+			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, null);
 			ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		}
 		
 		BingoAPI.GAME_STATE.create(random, gameMode, groupTeam, blackout);
-		source.getServer().getPlayerList().sendMessage(new TranslationTextComponent("command.bingo.create.announce" + (blackout ? ".blackout" : ""), source.getDisplayName()), true);
+		source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.create.announce"  + (blackout ? ".blackout" : ""), source.getDisplayName()), ChatType.SYSTEM, null);
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 	}
    

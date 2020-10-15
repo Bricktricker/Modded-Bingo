@@ -13,7 +13,10 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.JsonOps;
 
+import net.darkhax.bingo.ModdedBingo;
 import net.darkhax.bingo.api.effects.collection.CollectionEffect;
 import net.darkhax.bingo.api.effects.collection.CollectionEffectAnnouncement;
 import net.darkhax.bingo.api.effects.collection.CollectionEffectFirework;
@@ -33,7 +36,6 @@ import net.darkhax.bingo.api.goal.GoalTable;
 import net.darkhax.bingo.api.team.Team;
 import net.darkhax.bingo.data.BingoEffectTypeAdapter;
 import net.darkhax.bingo.data.GameState;
-import net.darkhax.bookshelf.util.MCJsonUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
@@ -46,6 +48,8 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 /**
  * This is the central API class for interacting with the bingo mod. If you are coding custom
@@ -268,7 +272,7 @@ public class BingoAPI {
         builder.registerTypeAdapter(BlockState.class, new JsonDeserializer<BlockState>() {
 			@Override
 			public BlockState deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return MCJsonUtils.deserializeBlockState(json.getAsJsonObject());
+				return BlockState.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, err -> ModdedBingo.LOG.error(err));
 			}
 		});
         
@@ -282,7 +286,7 @@ public class BingoAPI {
         builder.registerTypeAdapter(Effect.class, new JsonDeserializer<Effect>() {
 			@Override
 			public Effect deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return MCJsonUtils.getRegistryEntry(json, "effect", ForgeRegistries.POTIONS);
+				return getRegistryEntry(json, ForgeRegistries.POTIONS);
 			}
         });
         
@@ -296,28 +300,28 @@ public class BingoAPI {
         builder.registerTypeAdapter(Biome.class, new JsonDeserializer<Biome>() {
 			@Override
 			public Biome deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return MCJsonUtils.getRegistryEntry(json, null, ForgeRegistries.BIOMES);
+				return getRegistryEntry(json, ForgeRegistries.BIOMES);
 			}
 		});
         
         builder.registerTypeAdapter(Enchantment.class, new JsonDeserializer<Enchantment>() {
 			@Override
 			public Enchantment deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return MCJsonUtils.getRegistryEntry(json, null, ForgeRegistries.ENCHANTMENTS);
+				return getRegistryEntry(json, ForgeRegistries.ENCHANTMENTS);
 			}
 		});
         
         builder.registerTypeAdapter(SoundEvent.class, new JsonDeserializer<SoundEvent>() {
 			@Override
 			public SoundEvent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return MCJsonUtils.getRegistryEntry(json, null, ForgeRegistries.SOUND_EVENTS);
+				return getRegistryEntry(json, ForgeRegistries.SOUND_EVENTS);
 			}
 		});
         
         builder.registerTypeAdapter(EntityType.class, new JsonDeserializer<EntityType<?>>() {
 			@Override
 			public EntityType<?> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return MCJsonUtils.getRegistryEntry(json, null, ForgeRegistries.ENTITIES);
+				return getRegistryEntry(json, ForgeRegistries.ENTITIES);
 			}
         });
 
@@ -339,4 +343,28 @@ public class BingoAPI {
 
         registerStartingEffect("bingo:set_time", StartingEffectTime.class);
     }
+    
+    /**
+     * Copied from https://github.com/Darkhax-Minecraft/Bookshelf/blob/bffcd767dddb9de3f15daaca1415f4d2411b7051/src/main/java/net/darkhax/bookshelf/util/MCJsonUtils.java#L92
+     */
+	private static <T extends IForgeRegistryEntry<T>> T getRegistryEntry(JsonElement json, IForgeRegistry<T> registry) {
+		if(json.isJsonPrimitive()) {
+			final String rawId = json.getAsString();
+			final ResourceLocation registryId = ResourceLocation.tryCreate(rawId);
+
+			if(registryId != null) {
+				final T registryEntry = registry.getValue(registryId);
+				if(registryEntry != null) {
+					return registryEntry;
+				}else {
+
+					throw new JsonSyntaxException("No entry found for id " + rawId);
+				}
+			}else{
+				throw new JsonSyntaxException("Registry id " + rawId + " was not a valid format.");
+			}
+		}else{
+			throw new JsonSyntaxException("Expected a JSON primitive. was " + JSONUtils.toString(json));
+		}
+	}
 }

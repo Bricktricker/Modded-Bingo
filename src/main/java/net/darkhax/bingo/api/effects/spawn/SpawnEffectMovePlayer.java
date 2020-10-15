@@ -30,7 +30,7 @@ public class SpawnEffectMovePlayer extends SpawnEffect {
         player.setPositionAndUpdate(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
         if (this.setSpawn) {
-        	player.setSpawnPoint(pos, true, true, player.dimension);
+        	player.func_242111_a(player.getEntityWorld().getDimensionKey(), pos, 0.0F, true, false);
         }
 
         if (this.fallbackBlock != null && player.world.isAirBlock(pos.down())) {

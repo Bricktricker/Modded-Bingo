@@ -7,13 +7,14 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.entity.item.FireworkRocketEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -71,7 +72,7 @@ public class Team {
         TEAMS_BY_NAME.put(dyeColor.getTranslationKey(), this);
         TEAM_NAMES.add(dyeColor.getTranslationKey()); 
         this.teamName = new StringTextComponent(dyeColor.getTranslationKey());
-        this.teamName.getStyle().setColor(this.getTeamColorText());
+        this.teamName.getStyle().setColor(Color.fromTextFormatting(this.getTeamColorText()));
         this.color = this.dyeColor.getColorValue();
     }
 

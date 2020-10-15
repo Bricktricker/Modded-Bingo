@@ -70,7 +70,7 @@ public class BingoRenderer {
 
 		if(bingo.getStartTime() > 0 && mc.world != null) {
 			long endTime = bingo.getEndTime() >= bingo.getStartTime() ? bingo.getEndTime() : mc.world.getGameTime();
-			mc.fontRenderer.drawString("Time: " + StringUtils.ticksToElapsedTime((int) (endTime - bingo.getStartTime())), 14, 2, 0xffffff);
+			mc.fontRenderer.drawString(event.getMatrixStack(), "Time: " + StringUtils.ticksToElapsedTime((int) (endTime - bingo.getStartTime())), 14, 2, 0xffffff);
 		}
 
 		RenderSystem.pushMatrix();
