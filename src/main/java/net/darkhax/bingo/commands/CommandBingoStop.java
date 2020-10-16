@@ -8,6 +8,8 @@ import net.darkhax.bingo.api.BingoAPI;
 import net.darkhax.bingo.network.PacketSyncGameState;
 import net.darkhax.bookshelf.util.CommandUtils;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -20,8 +22,13 @@ public class CommandBingoStop {
 			}
 			BingoAPI.GAME_STATE.end();
 			CommandSource source = ctx.getSource();
+			Entity entity = source.getEntity();
+			if(entity == null) {
+				source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.DUMMY_UUID);	
+			}else {
+				source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUniqueID());
+			}
 			
-			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, null);
 			ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 			return 1;
 		});

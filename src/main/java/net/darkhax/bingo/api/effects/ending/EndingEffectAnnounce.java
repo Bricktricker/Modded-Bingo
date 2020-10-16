@@ -2,6 +2,7 @@ package net.darkhax.bingo.api.effects.ending;
 
 import net.darkhax.bingo.api.team.Team;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -13,6 +14,6 @@ public class EndingEffectAnnounce extends GameWinEffect {
 
     @Override
     public void onGameCompleted (MinecraftServer server, Team winningTeam) {
-        server.getPlayerList().func_232641_a_(new TranslationTextComponent("bingo.winner", winningTeam.getTeamName()), ChatType.SYSTEM, null);
+        server.getPlayerList().func_232641_a_(new TranslationTextComponent("bingo.winner", winningTeam.getTeamName()), ChatType.SYSTEM, Util.DUMMY_UUID);
     }
 }

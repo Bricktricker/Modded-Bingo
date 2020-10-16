@@ -15,8 +15,11 @@ import net.darkhax.bingo.network.PacketSyncGameState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.ResourceLocationArgument;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class CommandBingoCreate {
@@ -66,13 +69,22 @@ public class CommandBingoCreate {
 		
 		if(BingoAPI.GAME_STATE.hasStarted() || BingoAPI.GAME_STATE.isActive()) {
 			BingoAPI.GAME_STATE.end();
-			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, null);
+			sendToAll(source, new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()));
 			ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		}
 		
 		BingoAPI.GAME_STATE.create(random, gameMode, groupTeam, blackout);
-		source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.create.announce"  + (blackout ? ".blackout" : ""), source.getDisplayName()), ChatType.SYSTEM, null);
+		sendToAll(source, new TranslationTextComponent("command.bingo.create.announce"  + (blackout ? ".blackout" : ""), source.getDisplayName()));
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
+	}
+	
+	private static void sendToAll(CommandSource source, ITextComponent component) {
+		Entity entity = source.getEntity();
+		if(entity == null) {
+			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.DUMMY_UUID);
+		}else {
+			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUniqueID());
+		}
 	}
    
 }

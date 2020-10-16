@@ -34,7 +34,7 @@ public class CommandBingoTeam {
 			throw new DynamicCommandExceptionType(rl -> new TranslationTextComponent("command.bingo.team.unknown", rl)).create(teamStr);
 		}
 		
-		player.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.team.change", player.getName(), team.getTeamName()), ChatType.SYSTEM, null);
+		player.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.team.change", player.getName(), team.getTeamName()), ChatType.CHAT, player.getUniqueID());
 		BingoPersistantData.setTeam(player, team);
 	}
 }

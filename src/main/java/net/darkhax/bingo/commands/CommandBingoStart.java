@@ -42,7 +42,7 @@ public class CommandBingoStart {
         }
 		
 		BingoAPI.GAME_STATE.start(source.getServer(), source.world.getGameTime());
-		source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.SYSTEM, null);
+		source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.CHAT, source.getUniqueID());
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		
 		Map<Team, BlockPos> teamPositions = new HashMap<>();
