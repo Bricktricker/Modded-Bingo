@@ -20,7 +20,7 @@ public class StartingEffectTime extends StartingEffect {
     public void onGameStarted (MinecraftServer server) {
 
         for (final ServerWorld world : server.getWorlds()) {
-        	world.func_241114_a_(time);
+        	world.setDayTime(time);
         }
     }
 }
