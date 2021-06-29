@@ -69,10 +69,10 @@ public class Team {
         this.teamColorText = teamColorText;
         this.teamCorner = teamCorner;
         this.dyeColor = dyeColor;
-        TEAMS_BY_NAME.put(dyeColor.getTranslationKey(), this);
-        TEAM_NAMES.add(dyeColor.getTranslationKey()); 
-        this.teamName = new StringTextComponent(dyeColor.getTranslationKey());
-        this.teamName.getStyle().setColor(Color.fromTextFormatting(this.getTeamColorText()));
+        TEAMS_BY_NAME.put(dyeColor.getName(), this);
+        TEAM_NAMES.add(dyeColor.getName()); 
+        this.teamName = new StringTextComponent(dyeColor.getName());
+        this.teamName.getStyle().withColor(Color.fromLegacyFormat(this.getTeamColorText()));
         this.color = this.dyeColor.getColorValue();
     }
 
@@ -123,7 +123,7 @@ public class Team {
      */
     public String getTeamKey () {
 
-        return this.getDyeColor().getTranslationKey();
+        return this.getDyeColor().getName();
     }
 
     /**
@@ -155,10 +155,10 @@ public class Team {
      * @param player The player to spawn the firework on.
      */
     public void spawnFirework (ServerPlayerEntity player) {
-        final FireworkRocketEntity rocket = new FireworkRocketEntity(player.getEntityWorld(), player.getPosX(), player.getPosY(), player.getPosZ(), this.getFireworStack());
-        ObfuscationReflectionHelper.setPrivateValue(FireworkRocketEntity.class, rocket, 0, "field_92055_b"); //lifetime
-        player.getEntityWorld().addEntity(rocket);
-        player.world.setEntityState(rocket, (byte) 17);
+        final FireworkRocketEntity rocket = new FireworkRocketEntity(player.getCommandSenderWorld(), player.getX(), player.getY(), player.getZ(), this.getFireworStack());
+        ObfuscationReflectionHelper.setPrivateValue(FireworkRocketEntity.class, rocket, 0, "lifetime"); //lifetime
+        player.getCommandSenderWorld().addFreshEntity(rocket);
+        player.level.broadcastEntityEvent(rocket, (byte) 17);
     }
 
     /**

@@ -64,7 +64,7 @@ public class ModdedBingo {
 
         // Read the bingo persistent data from nbt data if it exists, when the server is
         // started.
-        final Path bingoFile = event.getServer().func_240776_a_(FolderName.DOT).resolve("bingo.data");
+        final Path bingoFile = event.getServer().getWorldPath(FolderName.ROOT).resolve("bingo.data");
         
         if (Files.exists(bingoFile)) {
             try{
@@ -88,7 +88,7 @@ public class ModdedBingo {
     public void serverStopping (FMLServerStoppingEvent event) {
 
         // Write the bingo data to the world when the server stops.
-    	final Path bingoFile = event.getServer().func_240776_a_(FolderName.DOT).resolve("bingo.data");
+    	final Path bingoFile = event.getServer().getWorldPath(FolderName.ROOT).resolve("bingo.data");
     	
         try(OutputStream os = Files.newOutputStream(bingoFile)) {
         	ByteBuf byteBuf = Unpooled.buffer();

@@ -27,7 +27,7 @@ public class CommandBingoStart {
 
 	public static LiteralArgumentBuilder<CommandSource> register() {
 		return CommandUtils.createCommand("start", 2, ctx -> {
-			execute(ctx.getSource().asPlayer());
+			execute(ctx.getSource().getPlayerOrException());
 			return 1;
 		});
 	}
@@ -41,8 +41,8 @@ public class CommandBingoStart {
 			throw new SimpleCommandExceptionType(new TranslationTextComponent("command.bingo.info.alreadystarted")).create();
         }
 		
-		BingoAPI.GAME_STATE.start(source.getServer(), source.world.getGameTime());
-		source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.CHAT, source.getUniqueID());
+		BingoAPI.GAME_STATE.start(source.getServer(), source.level.getGameTime());
+		source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.CHAT, source.getUUID());
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		
 		Map<Team, BlockPos> teamPositions = new HashMap<>();
@@ -73,13 +73,13 @@ public class CommandBingoStart {
         
         final BlockPos.Mutable pos = new BlockPos.Mutable(x, 255, z);
 
-        while (source.world.isAirBlock(pos)) {
+        while (source.level.isEmptyBlock(pos)) {
             pos.move(Direction.DOWN);
             if (pos.getY() <= 10) {
                 return depth == 100 ? pos : getRandomPosition(source, depth + 1);
             }
         }
 
-        return !source.world.isTopSolid(pos, source) && depth < 100 ? getRandomPosition(source, depth + 1) : pos.move(Direction.UP);
+        return !source.level.loadedAndEntityCanStandOn(pos, source) && depth < 100 ? getRandomPosition(source, depth + 1) : pos.move(Direction.UP);
     }
 }

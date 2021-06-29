@@ -180,7 +180,7 @@ public class GameState {
             ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGoal(x, y, playerTeam.getTeamKey()));
         }
 
-        this.updateWinState(player.server, player.world.getGameTime());
+        this.updateWinState(player.server, player.level.getGameTime());
     }
 
     /**
@@ -335,7 +335,7 @@ public class GameState {
                 for (int y = 0; y < 5; y++) {
 
                     final ItemStack goal = this.getGoal(x, y);
-                    if (ItemStack.areItemsEqual(goal, stack)) {
+                    if (ItemStack.isSame(goal, stack)) {
 
                         this.setGoalComplete(player, stack, x, y);
                     }
@@ -512,19 +512,19 @@ public class GameState {
     	this.blackout = buffer.readBoolean();
     	this.startTime = buffer.readLong();
     	this.endTime = buffer.readLong();
-        String winnerStr = buffer.readString(30);
+        String winnerStr = buffer.readUtf(30);
         if(!winnerStr.isEmpty()) {
         	this.winner = Team.getTeamByName(winnerStr);
         }
         
         if(buffer.readBoolean()) {
-        	this.mode = BingoAPI.getGameMode(new ResourceLocation(buffer.readString(30)));
-        	this.table = BingoAPI.getGoalTable(new ResourceLocation(buffer.readString(30)));
+        	this.mode = BingoAPI.getGameMode(new ResourceLocation(buffer.readUtf(30)));
+        	this.table = BingoAPI.getGoalTable(new ResourceLocation(buffer.readUtf(30)));
         	
         	//read the goal items
     		for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
-                	this.goals[x][y] = buffer.readItemStack();
+                	this.goals[x][y] = buffer.readItem();
                 }
             }
     		
@@ -532,7 +532,7 @@ public class GameState {
     		for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
                 	for(int z = 0; z < 4; z++) {
-                		String completedTeam = buffer.readString(30);
+                		String completedTeam = buffer.readUtf(30);
                     	if(!completedTeam.isEmpty()) {
                     		Team team = Team.getTeamByName(completedTeam);
                     		this.completionStates[x][y][team.getTeamCorner()] = team;
@@ -556,18 +556,18 @@ public class GameState {
     	buffer.writeBoolean(this.blackout);
     	buffer.writeLong(this.startTime);
     	buffer.writeLong(this.endTime);
-    	buffer.writeString(this.winner != null ? this.winner.getTeamKey() : "");
+    	buffer.writeUtf(this.winner != null ? this.winner.getTeamKey() : "");
     	
     	if(this.getTable() != null && this.mode != null) {
     		buffer.writeBoolean(true);
     		
-    		buffer.writeString(this.mode.getModeId().toString());
-    		buffer.writeString(this.getTable().getName().toString());
+    		buffer.writeUtf(this.mode.getModeId().toString());
+    		buffer.writeUtf(this.getTable().getName().toString());
     		
     		//write the goal items
     		for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
-                	buffer.writeItemStack(this.goals[x][y]);
+                	buffer.writeItem(this.goals[x][y]);
                 }
             }
     		
@@ -575,7 +575,7 @@ public class GameState {
     		for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
                 	for (final Team completedTeam : this.completionStates[x][y]) {
-                        buffer.writeString(completedTeam != null ? completedTeam.getTeamKey() : "");
+                        buffer.writeUtf(completedTeam != null ? completedTeam.getTeamKey() : "");
                     }
                 }
             }

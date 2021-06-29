@@ -12,9 +12,9 @@ public class SpawnEffectClearInventory extends SpawnEffect {
     @Override
     public void onPlayerSpawn (ServerPlayerEntity player, BlockPos pos) {
 
-        for (int slot = 0; slot < player.inventory.getSizeInventory(); slot++) {
+        for (int slot = 0; slot < player.inventory.getContainerSize(); slot++) {
             
-            player.inventory.setInventorySlotContents(slot, ItemStack.EMPTY);
+            player.inventory.setItem(slot, ItemStack.EMPTY);
         }
     }
 }

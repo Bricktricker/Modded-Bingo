@@ -14,6 +14,6 @@ public class EndingEffectAnnounce extends GameWinEffect {
 
     @Override
     public void onGameCompleted (MinecraftServer server, Team winningTeam) {
-        server.getPlayerList().func_232641_a_(new TranslationTextComponent("bingo.winner", winningTeam.getTeamName()), ChatType.SYSTEM, Util.DUMMY_UUID);
+        server.getPlayerList().broadcastMessage(new TranslationTextComponent("bingo.winner", winningTeam.getTeamName()), ChatType.SYSTEM, Util.NIL_UUID);
     }
 }

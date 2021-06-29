@@ -15,12 +15,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class CommandBingoTeam {
 
 	public static LiteralArgumentBuilder<CommandSource> register() {
-		LiteralArgumentBuilder<CommandSource> builder = Commands.literal("team").requires(sender ->sender.hasPermissionLevel(0));
+		LiteralArgumentBuilder<CommandSource> builder = Commands.literal("team").requires(sender ->sender.hasPermission(0));
 		
 		for(String team : Team.getTeamNames()) {
 			builder.then(Commands.literal(team)
 				.executes(ctx -> {
-					execute(ctx.getSource().asPlayer(), team);
+					execute(ctx.getSource().getPlayerOrException(), team);
 					return 1;
 				}));
 		}
@@ -34,7 +34,7 @@ public class CommandBingoTeam {
 			throw new DynamicCommandExceptionType(rl -> new TranslationTextComponent("command.bingo.team.unknown", rl)).create(teamStr);
 		}
 		
-		player.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.team.change", player.getName(), team.getTeamName()), ChatType.CHAT, player.getUniqueID());
+		player.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.team.change", player.getName(), team.getTeamName()), ChatType.CHAT, player.getUUID());
 		BingoPersistantData.setTeam(player, team);
 	}
 }

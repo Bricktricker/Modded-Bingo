@@ -19,11 +19,11 @@ public class CollectionEffectAnnouncement extends CollectionEffect {
     public void onItemCollected (ServerPlayerEntity player, ItemStack item, Team team) {
 
         final ITextComponent playerName = player.getDisplayName();
-        playerName.getStyle().setColor(Color.fromTextFormatting(team.getTeamColorText()));
+        playerName.getStyle().withColor(Color.fromLegacyFormat(team.getTeamColorText()));
 
-        final ITextComponent itemName = item.getTextComponent();
-        itemName.getStyle().setColor(Color.fromTextFormatting(TextFormatting.GRAY));
+        final ITextComponent itemName = item.getDisplayName();
+        itemName.getStyle().withColor(Color.fromLegacyFormat(TextFormatting.GRAY));
 
-        player.server.getPlayerList().func_232641_a_(new TranslationTextComponent("bingo.player.obtained", playerName, itemName), ChatType.SYSTEM, player.getUniqueID());
+        player.server.getPlayerList().broadcastMessage(new TranslationTextComponent("bingo.player.obtained", playerName, itemName), ChatType.SYSTEM, player.getUUID());
     }
 }

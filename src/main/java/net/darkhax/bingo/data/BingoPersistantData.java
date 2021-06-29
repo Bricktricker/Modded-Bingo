@@ -28,7 +28,7 @@ public class BingoPersistantData {
      */
     public static Team getTeam (PlayerEntity player) {
 
-        return PLAYER_TEAMS.getOrDefault(player.getUniqueID(), BingoAPI.TEAM_RED);
+        return PLAYER_TEAMS.getOrDefault(player.getUUID(), BingoAPI.TEAM_RED);
     }
 
     /**
@@ -39,7 +39,7 @@ public class BingoPersistantData {
      */
     public static void setTeam (PlayerEntity player, Team team) {
 
-        PLAYER_TEAMS.put(player.getUniqueID(), team);
+        PLAYER_TEAMS.put(player.getUUID(), team);
     }
     
     /**
@@ -50,8 +50,8 @@ public class BingoPersistantData {
     public static void write(PacketBuffer buffer) {
     	buffer.writeVarInt(PLAYER_TEAMS.entrySet().size());
     	for (final Entry<UUID, Team> entry : PLAYER_TEAMS.entrySet()) {
-    		buffer.writeUniqueId(entry.getKey());
-    		buffer.writeString(entry.getValue().getDyeColor().getTranslationKey());
+    		buffer.writeUUID(entry.getKey());
+    		buffer.writeUtf(entry.getValue().getDyeColor().getName());
         }
     	BingoAPI.GAME_STATE.write(buffer);
     }
@@ -65,8 +65,8 @@ public class BingoPersistantData {
     	PLAYER_TEAMS.clear();
     	int numPlayer = buffer.readVarInt();
     	for(int i = 0; i < numPlayer; i++) {
-    		final UUID uuid = buffer.readUniqueId();
-    		final Team team = Team.getTeamByName(buffer.readString(30));
+    		final UUID uuid = buffer.readUUID();
+    		final Team team = Team.getTeamByName(buffer.readUtf(30));
     		if(team != null) {
     			PLAYER_TEAMS.put(uuid, team);
     		}

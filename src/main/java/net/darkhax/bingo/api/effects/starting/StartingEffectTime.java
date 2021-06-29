@@ -19,7 +19,7 @@ public class StartingEffectTime extends StartingEffect {
     @Override
     public void onGameStarted (MinecraftServer server) {
 
-        for (final ServerWorld world : server.getWorlds()) {
+        for (final ServerWorld world : server.getAllLevels()) {
         	world.setDayTime(time);
         }
     }

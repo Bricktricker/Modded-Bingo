@@ -27,15 +27,15 @@ public class SpawnEffectMovePlayer extends SpawnEffect {
     @Override
     public void onPlayerSpawn (ServerPlayerEntity player, BlockPos pos) {
 
-        player.setPositionAndUpdate(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        player.teleportTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
         if (this.setSpawn) {
-        	player.func_242111_a(player.getEntityWorld().getDimensionKey(), pos, 0.0F, true, false);
+        	player.setRespawnPosition(player.getCommandSenderWorld().dimension(), pos, 0.0F, true, false);
         }
 
-        if (this.fallbackBlock != null && player.world.isAirBlock(pos.down())) {
+        if (this.fallbackBlock != null && player.level.isEmptyBlock(pos.below())) {
 
-            player.world.setBlockState(pos.down(), this.fallbackBlock);
+            player.level.setBlockAndUpdate(pos.below(), this.fallbackBlock);
         }
     }
 }

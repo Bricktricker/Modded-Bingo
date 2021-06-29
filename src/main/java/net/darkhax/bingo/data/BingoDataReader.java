@@ -36,7 +36,7 @@ public class BingoDataReader extends JsonReloadListener {
 				}
 				
 				JsonObject jsonObject = jsonElem.getAsJsonObject();
-				String type = JSONUtils.getString(jsonObject, "type");
+				String type = JSONUtils.getAsString(jsonObject, "type");
 				if(type.equalsIgnoreCase("gamemode")) {
 					GameMode gamemode = BingoAPI.GSON.fromJson(jsonObject, GameMode.class);
 					gamemodes.add(gamemode);

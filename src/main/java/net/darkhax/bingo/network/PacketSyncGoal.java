@@ -37,13 +37,13 @@ public class PacketSyncGoal {
     public PacketSyncGoal (PacketBuffer buffer) {
     	this.x = buffer.readInt();
     	this.y = buffer.readInt();
-    	this.teamName = buffer.readString(30);
+    	this.teamName = buffer.readUtf(30);
     }
     
     public void encode(PacketBuffer buffer) {
     	buffer.writeInt(this.x);
     	buffer.writeInt(this.y);
-    	buffer.writeString(this.teamName);
+    	buffer.writeUtf(this.teamName);
     }
     
     public void handle(Supplier<NetworkEvent.Context> ctx) {

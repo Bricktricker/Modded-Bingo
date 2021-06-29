@@ -33,9 +33,9 @@ public class BingoEventHandler {
     public static void onPlayerTick (TickEvent.PlayerTickEvent event) {
 
         // Only check once a second
-        if (event.player.ticksExisted % 20 == 0 && event.player instanceof ServerPlayerEntity) {
+        if (event.player.tickCount % 20 == 0 && event.player instanceof ServerPlayerEntity) {
 
-            for (final ItemStack stack : event.player.inventory.mainInventory) {
+            for (final ItemStack stack : event.player.inventory.items) {
 
                 if (!stack.isEmpty()) {
 

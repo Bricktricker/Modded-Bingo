@@ -48,9 +48,9 @@ public class BingoRenderer {
 				for(int y = 0; y < 5; y++) {
 
 					ItemStack goal = BingoAPI.GAME_STATE.getGoal(x, y);
-					if(goal != null && !goal.isEmpty() && ItemStack.areItemsEqual(goal, event.getItemStack())) {
+					if(goal != null && !goal.isEmpty() && ItemStack.isSame(goal, event.getItemStack())) {
 
-						event.getToolTip().add(new StringTextComponent(TextFormatting.YELLOW + I18n.format("tooltip.bingo.goalitem")));
+						event.getToolTip().add(new StringTextComponent(TextFormatting.YELLOW + I18n.get("tooltip.bingo.goalitem")));
 					}
 				}
 			}
@@ -65,17 +65,17 @@ public class BingoRenderer {
 		GameState bingo = BingoAPI.GAME_STATE;
 		final Minecraft mc = Minecraft.getInstance();
 
-		if(!bingo.isActive() || !Minecraft.isGuiEnabled() || mc.currentScreen != null || mc.gameSettings.showDebugInfo) {
+		if(!bingo.isActive() || !Minecraft.renderNames() || mc.screen != null || mc.options.renderDebug) {
 			return;
 		}
 
-		if(bingo.getStartTime() > 0 && mc.world != null) {
-			long endTime = bingo.getEndTime() >= bingo.getStartTime() ? bingo.getEndTime() : mc.world.getGameTime();
-			mc.fontRenderer.drawString(event.getMatrixStack(), "Time: " + StringUtils.ticksToElapsedTime((int) (endTime - bingo.getStartTime())), 14, 2, 0xffffff);
+		if(bingo.getStartTime() > 0 && mc.level != null) {
+			long endTime = bingo.getEndTime() >= bingo.getStartTime() ? bingo.getEndTime() : mc.level.getGameTime();
+			mc.font.draw(event.getMatrixStack(), "Time: " + StringUtils.formatTickDuration((int) (endTime - bingo.getStartTime())), 14, 2, 0xffffff);
 		}
 
-		mc.getTextureManager().bindTexture(TEXTURE_LOC);
-		renderGUI(event.getMatrixStack().getLast().getMatrix(), 10, 142, 10, 142, 0, 0, 132f / 256f, 0, 132f / 256f);
+		mc.getTextureManager().bind(TEXTURE_LOC);
+		renderGUI(event.getMatrixStack().last().pose(), 10, 142, 10, 142, 0, 0, 132f / 256f, 0, 132f / 256f);
 
 		final ItemRenderer itemRender = mc.getItemRenderer();
 
@@ -85,7 +85,7 @@ public class BingoRenderer {
 				final ItemStack goal = BingoAPI.GAME_STATE.getGoal(x, y);
 
 				if(goal != null) {
-					itemRender.renderItemAndEffectIntoGUI(null, goal, 16 + x * 24, 16 + y * 24);
+					itemRender.renderAndDecorateItem(null, goal, 16 + x * 24, 16 + y * 24);
 				}
 			}
 		}
@@ -94,15 +94,15 @@ public class BingoRenderer {
 
 	@SuppressWarnings("deprecation")
 	private static void renderGUI(Matrix4f matrix, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1) {
-		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
+		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuilder();
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		bufferbuilder.pos(matrix, (float) x0, (float) y1, (float) z).tex(u0, v1).endVertex();
-		bufferbuilder.pos(matrix, (float) x1, (float) y1, (float) z).tex(u1, v1).endVertex();
-		bufferbuilder.pos(matrix, (float) x1, (float) y0, (float) z).tex(u1, v0).endVertex();
-		bufferbuilder.pos(matrix, (float) x0, (float) y0, (float) z).tex(u0, v0).endVertex();
-		bufferbuilder.finishDrawing();
+		bufferbuilder.vertex(matrix, (float) x0, (float) y1, (float) z).uv(u0, v1).endVertex();
+		bufferbuilder.vertex(matrix, (float) x1, (float) y1, (float) z).uv(u1, v1).endVertex();
+		bufferbuilder.vertex(matrix, (float) x1, (float) y0, (float) z).uv(u1, v0).endVertex();
+		bufferbuilder.vertex(matrix, (float) x0, (float) y0, (float) z).uv(u0, v0).endVertex();
+		bufferbuilder.end();
 		RenderSystem.enableAlphaTest();
-		WorldVertexBufferUploader.draw(bufferbuilder);
+		WorldVertexBufferUploader.end(bufferbuilder);
 
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 		final float texSize = 256f;
@@ -115,7 +115,7 @@ public class BingoRenderer {
 
 					if(team != null) {
 						final int[] uvs = teamUVs[team.getTeamCorner()];
-						final float[] color = team.getDyeColor().getColorComponentValues();
+						final float[] color = team.getDyeColor().getTextureDiffuseColors();
 
 						final int xOffset = 13 + x * 24 + uvs[0];
 						final int yOffset = 13 + y * 24 + uvs[1];
@@ -124,15 +124,15 @@ public class BingoRenderer {
 						final float minV = uvs[1] / texSize;
 						final float maxV = (uvs[1] + uvs[3]) / texSize;
 
-						bufferbuilder.pos(matrix, xOffset, yOffset + uvs[3], 0).tex(minU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
-						bufferbuilder.pos(matrix, xOffset + uvs[2], yOffset + uvs[3], 0).tex(maxU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
-						bufferbuilder.pos(matrix, xOffset + uvs[2], yOffset, 0).tex(maxU, minV).color(color[0], color[1], color[2], 1f).endVertex();
-						bufferbuilder.pos(matrix, xOffset, yOffset, 0).tex(minU, minV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.vertex(matrix, xOffset, yOffset + uvs[3], 0).uv(minU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.vertex(matrix, xOffset + uvs[2], yOffset + uvs[3], 0).uv(maxU, maxV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.vertex(matrix, xOffset + uvs[2], yOffset, 0).uv(maxU, minV).color(color[0], color[1], color[2], 1f).endVertex();
+						bufferbuilder.vertex(matrix, xOffset, yOffset, 0).uv(minU, minV).color(color[0], color[1], color[2], 1f).endVertex();
 					}
 				}
 			}
 		}
-		bufferbuilder.finishDrawing();
-		WorldVertexBufferUploader.draw(bufferbuilder);
+		bufferbuilder.end();
+		WorldVertexBufferUploader.end(bufferbuilder);
 	}
 }

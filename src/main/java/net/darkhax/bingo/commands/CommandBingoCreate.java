@@ -25,26 +25,26 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class CommandBingoCreate {
 
 	public static LiteralArgumentBuilder<CommandSource> register() {
-		LiteralArgumentBuilder<CommandSource> builder = Commands.literal("create").requires(sender ->sender.hasPermissionLevel(2));
+		LiteralArgumentBuilder<CommandSource> builder = Commands.literal("create").requires(sender ->sender.hasPermission(2));
 		
-				builder.then(Commands.argument("gamemode", ResourceLocationArgument.resourceLocation())
+				builder.then(Commands.argument("gamemode", ResourceLocationArgument.id())
 						.executes(ctx -> {
-							execute(ctx.getSource(), ResourceLocationArgument.getResourceLocation(ctx, "gamemode"), true, false, -1);
+							execute(ctx.getSource(), ResourceLocationArgument.getId(ctx, "gamemode"), true, false, -1);
 							return 1;
 						})
 						.then(Commands.argument("groupTeam", BoolArgumentType.bool())
 								.executes(ctx -> {
-									execute(ctx.getSource(), ResourceLocationArgument.getResourceLocation(ctx, "gamemode"), BoolArgumentType.getBool(ctx, "groupTeam"), false, -1);
+									execute(ctx.getSource(), ResourceLocationArgument.getId(ctx, "gamemode"), BoolArgumentType.getBool(ctx, "groupTeam"), false, -1);
 									return 1;
 								})
 								.then(Commands.argument("blackout", BoolArgumentType.bool())
 										.executes(ctx -> {
-											execute(ctx.getSource(), ResourceLocationArgument.getResourceLocation(ctx, "gamemode"), BoolArgumentType.getBool(ctx, "groupTeam"), BoolArgumentType.getBool(ctx, "blackout"), -1);
+											execute(ctx.getSource(), ResourceLocationArgument.getId(ctx, "gamemode"), BoolArgumentType.getBool(ctx, "groupTeam"), BoolArgumentType.getBool(ctx, "blackout"), -1);
 											return 1;
 										})
 										.then(Commands.argument("seed", IntegerArgumentType.integer(0))
 												.executes(ctx -> {
-													execute(ctx.getSource(), ResourceLocationArgument.getResourceLocation(ctx, "gamemode"), BoolArgumentType.getBool(ctx, "groupTeam"), BoolArgumentType.getBool(ctx, "blackout"), ctx.getArgument("seed", Integer.class));
+													execute(ctx.getSource(), ResourceLocationArgument.getId(ctx, "gamemode"), BoolArgumentType.getBool(ctx, "groupTeam"), BoolArgumentType.getBool(ctx, "blackout"), ctx.getArgument("seed", Integer.class));
 													return 1;
 												})
 										)
@@ -81,9 +81,9 @@ public class CommandBingoCreate {
 	private static void sendToAll(CommandSource source, ITextComponent component) {
 		Entity entity = source.getEntity();
 		if(entity == null) {
-			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.DUMMY_UUID);
+			source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.NIL_UUID);
 		}else {
-			source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUniqueID());
+			source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUUID());
 		}
 	}
    

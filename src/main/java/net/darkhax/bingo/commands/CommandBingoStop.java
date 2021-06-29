@@ -24,9 +24,9 @@ public class CommandBingoStop {
 			CommandSource source = ctx.getSource();
 			Entity entity = source.getEntity();
 			if(entity == null) {
-				source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.DUMMY_UUID);	
+				source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.NIL_UUID);	
 			}else {
-				source.getServer().getPlayerList().func_232641_a_(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUniqueID());
+				source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUUID());
 			}
 			
 			ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());

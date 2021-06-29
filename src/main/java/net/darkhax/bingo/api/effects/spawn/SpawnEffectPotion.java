@@ -32,6 +32,6 @@ public class SpawnEffectPotion extends SpawnEffect {
 
     @Override
     public void onPlayerSpawn (ServerPlayerEntity player, BlockPos pos) {
-        player.addPotionEffect(new EffectInstance(this.effect, this.duration, this.amplifier));
+        player.addEffect(new EffectInstance(this.effect, this.duration, this.amplifier));
     }
 }

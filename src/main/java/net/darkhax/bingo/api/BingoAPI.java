@@ -293,7 +293,7 @@ public class BingoAPI {
         builder.registerTypeAdapter(Item.class, new JsonDeserializer<Item>() {
 			@Override
 			public Item deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return JSONUtils.getItem(json, "item");
+				return JSONUtils.convertToItem(json, "item");
 			}
         });
         
@@ -350,7 +350,7 @@ public class BingoAPI {
 	private static <T extends IForgeRegistryEntry<T>> T getRegistryEntry(JsonElement json, IForgeRegistry<T> registry) {
 		if(json.isJsonPrimitive()) {
 			final String rawId = json.getAsString();
-			final ResourceLocation registryId = ResourceLocation.tryCreate(rawId);
+			final ResourceLocation registryId = ResourceLocation.tryParse(rawId);
 
 			if(registryId != null) {
 				final T registryEntry = registry.getValue(registryId);
@@ -364,7 +364,7 @@ public class BingoAPI {
 				throw new JsonSyntaxException("Registry id " + rawId + " was not a valid format.");
 			}
 		}else{
-			throw new JsonSyntaxException("Expected a JSON primitive. was " + JSONUtils.toString(json));
+			throw new JsonSyntaxException("Expected a JSON primitive. was " + JSONUtils.getType(json));
 		}
 	}
 }
