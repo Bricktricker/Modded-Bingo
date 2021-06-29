@@ -92,7 +92,6 @@ public class BingoRenderer {
 
 	}
 
-	@SuppressWarnings("deprecation")
 	private static void renderGUI(Matrix4f matrix, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1) {
 		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuilder();
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
