@@ -73,7 +73,7 @@ public class BingoPersistantData {
     		buffer.writeUtf(entry.getValue().getDyeColor().getName());
         }
     	
-    	if(BingoAPI.GAME_STATE.hasStarted()) {
+    	if(BingoAPI.GAME_STATE.hasStarted() && BingoAPI.GAME_STATE.shouldGroupTeams()) {
     		buffer.writeBoolean(true);
         	for(Team team : BingoAPI.TEAMS) {
         		BlockPos startPos = team.getStartPosition();

@@ -176,6 +176,28 @@ public class Team {
 	public void setStartPosition(BlockPos startPosition) {
 		this.startPosition = startPosition;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + color;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
+		Team other = (Team) obj;
+		if(color != other.color)
+			return false;
+		return true;
+	}
 
 	/**
      * Gets a team by their name.

@@ -36,7 +36,7 @@ public class BingoEventHandler {
 				// and apply spawn effects, to clear his inventory / teleport him
 				if(!BingoPersistantData.isInTeam(player)) {
 					BingoPersistantData.setTeam(player, BingoAPI.TEAM_RED);
-					CommandBingoStart.applySpawnEffects(player);
+					CommandBingoStart.applySpawnEffects(player, null);
 				}
 			}
 			ModdedBingo.NETWORK.sendToPlayer(player, new PacketSyncGameState());

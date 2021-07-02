@@ -1,12 +1,19 @@
 package net.darkhax.bingo.commands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import javax.annotation.Nullable;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.darkhax.bingo.ModdedBingo;
+import net.darkhax.bingo.PregenWorker;
 import net.darkhax.bingo.api.BingoAPI;
 import net.darkhax.bingo.api.effects.spawn.SpawnEffect;
 import net.darkhax.bingo.api.team.Team;
@@ -20,6 +27,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
+import net.minecraftforge.common.WorldWorkerManager;
 
 public class CommandBingoStart {
 
@@ -43,23 +52,68 @@ public class CommandBingoStart {
 		source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.CHAT, source.getUUID());
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		
-		if (BingoAPI.GAME_STATE.shouldGroupTeams()) {
-            for (Team team : BingoAPI.TEAMS) {
-            	team.setStartPosition(getRandomPosition(source, 0));
-            }
-        }
-		
-		for (final ServerPlayerEntity player : source.getServer().getPlayerList().getPlayers()) {
-			applySpawnEffects(player);
-        }
-		
+		if(BingoAPI.GAME_STATE.shouldGroupTeams()) {
+			final Map<Team, List<ServerPlayerEntity>> teamMap = new HashMap<>();
+			for (final ServerPlayerEntity player : source.getServer().getPlayerList().getPlayers()) {
+				Team t = BingoPersistantData.getTeam(player);
+				teamMap.computeIfAbsent(t, k -> new ArrayList<>()).add(player);
+			}
+			
+			for(final Map.Entry<Team, List<ServerPlayerEntity>> entry : teamMap.entrySet()) {
+				BlockPos startPos = getRandomPosition(entry.getValue().get(0), 0);
+				entry.getKey().setStartPosition(startPos);
+				PregenWorker genWorker = new PregenWorker(startPos, source.getServer().getLevel(World.OVERWORLD), () -> {
+            		for (final ServerPlayerEntity player : entry.getValue()) {
+            			applySpawnEffects(player, startPos);
+                    }
+            	});
+            	WorldWorkerManager.addWorker(genWorker);
+			}
+			
+			// Generate starting positions for empty teams, makes things easier
+			for(Team team : BingoAPI.TEAMS) {
+				if(team.getStartPosition() == null) {
+					team.setStartPosition(getRandomPosition(source, 0));
+				}
+			}
+			
+		}else {
+			for (final ServerPlayerEntity player : source.getServer().getPlayerList().getPlayers()) {
+				BlockPos startPos = getRandomPosition(player, 0);
+				PregenWorker genWorker = new PregenWorker(startPos, source.getServer().getLevel(World.OVERWORLD), () -> {
+					applySpawnEffects(player, startPos);
+            	});
+            	WorldWorkerManager.addWorker(genWorker);
+			}
+		}
 	}
 	
-	public static void applySpawnEffects(ServerPlayerEntity player) {
-		BlockPos spawnPos = BingoAPI.GAME_STATE.shouldGroupTeams() ? BingoPersistantData.getTeam(player).getStartPosition() : getRandomPosition(player, 0);
+	/**
+	 * Applies the spawnEffects to the given player
+	 * @param player The player to apply the spawn effects
+	 * @param spawnPos If present, pass in the known spawn Position, or null
+	 */
+	public static void applySpawnEffects(ServerPlayerEntity player, @Nullable BlockPos spawnPos) {
+		if(spawnPos == null) {
+			spawnPos = getSpawnPositionFor(player);
+		}
         for (final SpawnEffect effect : BingoAPI.GAME_STATE.getMode().getSpawnEffect()) {
             effect.onPlayerSpawn(player, spawnPos);
         }
+	}
+	
+	private static BlockPos getSpawnPositionFor(ServerPlayerEntity player) {
+		if (BingoAPI.GAME_STATE.shouldGroupTeams()) {
+			Team team = BingoPersistantData.getTeam(player);
+			BlockPos teamPos = team.getStartPosition();
+			if(teamPos == null) {
+				teamPos = getRandomPosition(player, 0);
+				team.setStartPosition(teamPos);
+			}
+			return teamPos;
+		}else {
+			return getRandomPosition(player, 0);
+		}
 	}
 	
 	private static BlockPos getRandomPosition(ServerPlayerEntity source, int depth) {

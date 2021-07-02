@@ -69,19 +69,18 @@ public class ModdedBingo {
         if (Files.exists(bingoFile)) {
             try{
             	byte[] data = Files.readAllBytes(bingoFile);
-            	BingoPersistantData.read(new PacketBuffer(Unpooled.wrappedBuffer(data)));
+            	if(data.length != 0) {
+            		BingoPersistantData.read(new PacketBuffer(Unpooled.wrappedBuffer(data)));
+            		return;
+            	}
             }
             catch (final IOException e) {
                 LOG.warn("Failed to read bingo data. This is not good.");
                 LOG.catching(e);
             }
         }
-        
-        else {
-            
-            // reset the game state
-            BingoAPI.GAME_STATE.read(null);
-        }
+        // reset the game state
+        BingoAPI.GAME_STATE.read(null);
     }
 
     @SubscribeEvent
