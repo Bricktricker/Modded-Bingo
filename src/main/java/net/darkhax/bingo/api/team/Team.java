@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -59,6 +60,12 @@ public class Team {
      * A text component of the team name.
      */
     private final ITextComponent teamName;
+    
+    /**
+     * The respawn position of the team
+     */
+    @Nullable
+    private BlockPos startPosition;
 
     /**
      * A packed RGB int containing the color code of the team.
@@ -160,8 +167,17 @@ public class Team {
         player.getCommandSenderWorld().addFreshEntity(rocket);
         player.level.broadcastEntityEvent(rocket, (byte) 17);
     }
+    
+	public BlockPos getStartPosition() {
+		return startPosition;
+	}
 
-    /**
+	
+	public void setStartPosition(BlockPos startPosition) {
+		this.startPosition = startPosition;
+	}
+
+	/**
      * Gets a team by their name.
      *
      * @param name The name to search for.

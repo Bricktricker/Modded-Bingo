@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.darkhax.bingo.ModdedBingo;
 import net.darkhax.bingo.api.BingoAPI;
+import net.darkhax.bingo.api.team.Team;
 import net.darkhax.bingo.network.PacketSyncGameState;
 import net.darkhax.bookshelf.util.CommandUtils;
 import net.minecraft.command.CommandSource;
@@ -27,6 +28,10 @@ public class CommandBingoStop {
 				source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.NIL_UUID);	
 			}else {
 				source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUUID());
+			}
+			
+			for(Team team : BingoAPI.TEAMS) {
+				team.setStartPosition(null);
 			}
 			
 			ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());

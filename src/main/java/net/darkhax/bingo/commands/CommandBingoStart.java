@@ -1,7 +1,5 @@
 package net.darkhax.bingo.commands;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -45,21 +43,23 @@ public class CommandBingoStart {
 		source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.start.started", source.getDisplayName()), ChatType.CHAT, source.getUUID());
 		ModdedBingo.NETWORK.sendToAllPlayers(new PacketSyncGameState());
 		
-		Map<Team, BlockPos> teamPositions = new HashMap<>();
-		
 		if (BingoAPI.GAME_STATE.shouldGroupTeams()) {
             for (Team team : BingoAPI.TEAMS) {
-                teamPositions.put(team, getRandomPosition(source, 0));
+            	team.setStartPosition(getRandomPosition(source, 0));
             }
         }
 		
 		for (final ServerPlayerEntity player : source.getServer().getPlayerList().getPlayers()) {
-            BlockPos spawnPos = BingoAPI.GAME_STATE.shouldGroupTeams() ? teamPositions.get(BingoPersistantData.getTeam(player)) : getRandomPosition(player, 0);
-            for (final SpawnEffect effect : BingoAPI.GAME_STATE.getMode().getSpawnEffect()) {
-                effect.onPlayerSpawn(player, spawnPos);
-            }
+			applySpawnEffects(player);
         }
 		
+	}
+	
+	public static void applySpawnEffects(ServerPlayerEntity player) {
+		BlockPos spawnPos = BingoAPI.GAME_STATE.shouldGroupTeams() ? BingoPersistantData.getTeam(player).getStartPosition() : getRandomPosition(player, 0);
+        for (final SpawnEffect effect : BingoAPI.GAME_STATE.getMode().getSpawnEffect()) {
+            effect.onPlayerSpawn(player, spawnPos);
+        }
 	}
 	
 	private static BlockPos getRandomPosition(ServerPlayerEntity source, int depth) {

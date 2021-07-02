@@ -81,9 +81,9 @@ public class CommandBingoCreate {
 	private static void sendToAll(CommandSource source, ITextComponent component) {
 		Entity entity = source.getEntity();
 		if(entity == null) {
-			source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.SYSTEM, Util.NIL_UUID);
+			source.getServer().getPlayerList().broadcastMessage(component, ChatType.SYSTEM, Util.NIL_UUID);
 		}else {
-			source.getServer().getPlayerList().broadcastMessage(new TranslationTextComponent("command.bingo.stop.stopped", source.getDisplayName()), ChatType.CHAT, entity.getUUID());
+			source.getServer().getPlayerList().broadcastMessage(component, ChatType.CHAT, entity.getUUID());
 		}
 	}
    

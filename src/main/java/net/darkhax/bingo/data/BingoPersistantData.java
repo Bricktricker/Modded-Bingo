@@ -9,6 +9,7 @@ import net.darkhax.bingo.api.BingoAPI;
 import net.darkhax.bingo.api.team.Team;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This class is responsible for handling all save data that is persistent in the world.
@@ -30,6 +31,15 @@ public class BingoPersistantData {
 
         return PLAYER_TEAMS.getOrDefault(player.getUUID(), BingoAPI.TEAM_RED);
     }
+    
+    /**
+     * Checks if the given player is in a team
+     * @param player The player to lookup
+     * @return true if the player is in a team
+     */
+    public static boolean isInTeam(PlayerEntity player) {
+    	return PLAYER_TEAMS.containsKey(player.getUUID());
+    }
 
     /**
      * Sets the team for a player.
@@ -43,6 +53,15 @@ public class BingoPersistantData {
     }
     
     /**
+     * removes a player from the teams list
+     * @param player the player to remove
+     */
+    public static void removePlayer(PlayerEntity player) {
+    	
+    	PLAYER_TEAMS.remove(player.getUUID());
+    }
+    
+    /**
      * Writes all of the data to the provided PacketBuffer
      * 
      * @param buffer The PacketBuffer to write the game state to.
@@ -53,6 +72,17 @@ public class BingoPersistantData {
     		buffer.writeUUID(entry.getKey());
     		buffer.writeUtf(entry.getValue().getDyeColor().getName());
         }
+    	
+    	if(BingoAPI.GAME_STATE.hasStarted()) {
+    		buffer.writeBoolean(true);
+        	for(Team team : BingoAPI.TEAMS) {
+        		BlockPos startPos = team.getStartPosition();
+        		buffer.writeBlockPos(startPos);
+        	}	
+    	}else {
+    		buffer.writeBoolean(false);
+    	}
+    	
     	BingoAPI.GAME_STATE.write(buffer);
     }
     
@@ -71,6 +101,14 @@ public class BingoPersistantData {
     			PLAYER_TEAMS.put(uuid, team);
     		}
     	}
+    	
+    	if(buffer.readBoolean()) {
+    		for(Team team : BingoAPI.TEAMS) {
+        		BlockPos startPos = buffer.readBlockPos();
+        		team.setStartPosition(startPos);
+        	}
+    	}
+    	
     	BingoAPI.GAME_STATE.read(buffer);
     }
 

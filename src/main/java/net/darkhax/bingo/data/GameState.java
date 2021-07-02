@@ -110,6 +110,13 @@ public class GameState {
 
         this.hasStarted = true;
         this.startTime = startTime;
+        
+        //set default team to red
+        server.getPlayerList().getPlayers().forEach(player -> {
+        	if(!BingoPersistantData.isInTeam(player)) {
+        		BingoPersistantData.setTeam(player, BingoAPI.TEAM_RED);
+        	}
+        });
 
         for (final StartingEffect effect : this.mode.getStartingEffects()) {
 
@@ -584,11 +591,6 @@ public class GameState {
     		buffer.writeBoolean(false); //end of data
     	}
     	
-    }
-
-    public boolean isHasStarted () {
-        
-        return hasStarted;
     }
 
     public boolean shouldGroupTeams () {
