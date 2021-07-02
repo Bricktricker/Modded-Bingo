@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[35,)"
+loaderVersion="[36,)"
 license="LGPL v2.1"
 
 [[mods]]
@@ -14,20 +14,20 @@ description='''
 [[dependencies.bingo]]
     modId="forge"
     mandatory=true
-    versionRange="[35,)"
+    versionRange="[36,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.bingo]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3,1.17)"
+    versionRange="[1.16.5,1.17)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.bingo]]
     modId="bookshelf"
     mandatory=true
-    versionRange="[9.3.18,)"
+    versionRange="[10.0.1,)"
     ordering="AFTER"
     side="BOTH"
